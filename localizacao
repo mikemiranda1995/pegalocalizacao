@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Captura de Localização e Foto</title>
+</head>
+<body>
+    <h1>Captura de Localização e Foto</h1>
+    <button id="getLocation">Obter Localização</button>
+    <p id="location"></p>
+    <video id="video" width="320" height="240" autoplay></video>
+    <button id="takePhoto">Tirar Foto</button>
+    <canvas id="canvas" width="320" height="240" style="display:none;"></canvas>
+    <img id="photo" alt="Sua Foto" />
+
+    <script>
+        // Função para obter a localização do usuário
+        document.getElementById('getLocation').addEventListener('click', () => {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const { latitude, longitude } = position.coords;
+                        document.getElementById('location').textContent = `Latitude: ${latitude}, Longitude: ${longitude}`;
+                    },
+                    (error) => {
+                        console.error('Erro ao obter localização:', error);
+                    }
+                );
+            } else {
+                alert('Geolocalização não é suportada pelo seu navegador.');
+            }
+        });
+
+        // Acessar a câmera do usuário
+        const video = document.getElementById('video');
+        const constraints = { video: true };
+
+        navigator.mediaDevices.getUserMedia(constraints)
+            .then((stream) => {
+                video.srcObject = stream;
+            })
+            .catch((error) => {
+                console.error('Erro ao acessar a câmera:', error);
+            });
+
+        // Função para capturar a foto
+        document.getElementById('takePhoto').addEventListener('click', () => {
+            const canvas = document.getElementById('canvas');
+            const context = canvas.getContext('2d');
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const imageDataURL = canvas.toDataURL('image/png');
+            document.getElementById('photo').src = imageDataURL;
+        });
+    </script>
+</body>
+</html>
